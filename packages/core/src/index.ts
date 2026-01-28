@@ -24,3 +24,5 @@ export const parse = (
 export const visit = (node: Stylesheet, visitor: Visitor): Stylesheet => {
    return visitor.visitStylesheet(node);
 };
+
+export { Visitor };

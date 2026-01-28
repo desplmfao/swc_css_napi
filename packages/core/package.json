@@ -13,6 +13,12 @@
          "import": "./src/index.ts",
          "require": "./src/index.ts"
       },
+      "./Visitor": {
+         "source": "./src/Visitor.ts",
+         "types": "./dist/Visitor.ts",
+         "import": "./src/Visitor.ts",
+         "require": "./src/Visitor.ts"
+      },
       "./*": {
          "source": "./src/*.ts",
          "types": "./dist/*.ts",
