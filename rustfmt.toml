@@ -1,0 +1,28 @@
+brace_style = 'PreferSameLine'
+control_brace_style = 'AlwaysSameLine'
+combine_control_expr = true
+force_multiline_blocks = false
+fn_single_line = false
+where_single_line = true
+
+fn_params_layout = 'Vertical'
+imports_layout = 'Mixed'
+chain_width = 0
+
+max_width = 100
+tab_spaces = 3
+hard_tabs = false
+indent_style = 'Block'
+imports_indent = 'Block'
+
+color = 'Always'
+empty_item_single_line = true
+enum_discrim_align_threshold = 150
+format_code_in_doc_comments = true
+format_strings = true
+trailing_comma = 'Vertical'
+trailing_semicolon = true
+type_punctuation_density = 'Wide'
+use_field_init_shorthand = true
+use_small_heuristics = 'Default'
+wrap_comments = true

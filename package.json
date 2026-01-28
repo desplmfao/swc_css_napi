@@ -1,0 +1,13 @@
+{
+   "name": "swc-css-napi-workspace",
+   "private": true,
+   "scripts": {
+      "build": "napi build --release --strip --platform --package-json-path packages/core/package.json --manifest-path crates/swc_css_napi/Cargo.toml --output-dir packages/core --js binding.js --dts binding.d.ts"
+   },
+   "workspaces": [
+      "packages/**"
+   ],
+   "devDependencies": {
+      "@napi-rs/cli": "^3.5.1"
+   }
+}

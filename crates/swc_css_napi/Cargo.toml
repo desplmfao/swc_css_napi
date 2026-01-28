@@ -1,0 +1,27 @@
+[package]
+name = 'swc_css_visit_napi'
+version = '0.1.0'
+edition = '2024'
+
+[lib]
+crate-type = ['cdylib']
+
+[build-dependencies]
+napi-build = '2'
+
+[dependencies]
+napi = { version = '3.8.2', features = ['napi4', 'serde-json'] }
+napi-derive = '3.5.1'
+serde = { version = '1.0', features = ['derive'] }
+serde_json = '1.0'
+
+[dependencies.swc_core]
+version = '56.0.0'
+features = [
+   'css_ast',
+   'css_parser',
+   'css_ast_serde',
+   'css_visit',
+   'common',
+   'swc_common',
+]

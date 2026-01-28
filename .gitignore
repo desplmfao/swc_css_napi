@@ -1,0 +1,7 @@
+target/
+node_modules/
+packaged*
+*.node
+binding.*
+*.lock
+*-lock.yaml
