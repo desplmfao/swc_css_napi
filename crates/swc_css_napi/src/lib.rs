@@ -15,6 +15,7 @@ pub struct JsParserConfig {
    pub css_modules: Option<bool>,
    pub legacy_nesting: Option<bool>,
    pub legacy_ie: Option<bool>,
+   pub filename: Option<String>,
 }
 
 fn get_parser_config(opts: Option<JsParserConfig>) -> ParserConfig {
@@ -23,6 +24,7 @@ fn get_parser_config(opts: Option<JsParserConfig>) -> ParserConfig {
       css_modules: None,
       legacy_nesting: None,
       legacy_ie: None,
+      filename: None,
    });
 
    ParserConfig {
@@ -48,7 +50,16 @@ pub fn parse(
 ) -> napi::Result<serde_json::Value> {
    let cm = Lrc::new(SourceMap::default());
    let handler = Handler::with_emitter_writer(Box::new(std::io::stderr()), Some(cm.clone()));
-   let fm = cm.new_source_file(Lrc::new(FileName::Custom("input.css".to_string())), code);
+
+   let filename = options
+      .as_ref()
+      .and_then(|o| {
+         o.filename
+            .clone()
+      })
+      .unwrap_or_else(|| "input.css".to_string());
+
+   let fm = cm.new_source_file(Lrc::new(FileName::Custom(filename.clone())), code);
 
    let config = get_parser_config(options);
 
@@ -58,14 +69,50 @@ pub fn parse(
 
    let result: Result<Stylesheet, CssError> = parser.parse_all();
 
+   let errors = parser.take_errors();
+
+   let convert_err = |err: CssError| -> napi::Error {
+      let mut builder = err.to_diagnostics(&handler);
+
+      let span = builder
+         .span
+         .primary_span()
+         .unwrap_or_default();
+      let loc = cm.lookup_char_pos(span.lo);
+
+      let error_msg = builder
+         .message
+         .iter()
+         .map(|s| {
+            s.0.as_str()
+         })
+         .collect::<String>();
+
+      builder.cancel();
+
+      let msg = format!(
+         "{} at {}:{}:{}",
+         error_msg,
+         filename,
+         loc.line,
+         loc.col
+            .0
+            + 1
+      );
+
+      napi::Error::from_reason(msg)
+   };
+
+   if let Some(err) = errors
+      .into_iter()
+      .next()
+   {
+      return Err(convert_err(err));
+   }
+
    match result {
       Ok(stylesheet) => serde_json::to_value(&stylesheet)
          .map_err(|e| napi::Error::from_reason(format!("ast serialization failed: {}", e))),
-      Err(err) => {
-         err.to_diagnostics(&handler)
-            .emit();
-
-         Err(napi::Error::from_reason("css parsing failed"))
-      }
+      Err(err) => Err(convert_err(err)),
    }
 }
